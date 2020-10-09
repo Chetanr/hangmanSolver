@@ -60,7 +60,7 @@ public class DictAwareSolver extends HangmanSolver
     /*
         getter for guessDictionary variable
      */
-    public List<String> getGuessDictionary() {
+    public ArrayList<String> getGuessDictionary() {
         return this.guessDictionary;
     }
 
@@ -204,6 +204,9 @@ public class DictAwareSolver extends HangmanSolver
                 }
             }
         }
+
+        //sort the arraylist in ascending order
+        Collections.sort(getGuessDictionary());
 
         int numCh = 0;
         for (int i = 0 ; i < getGuessDictionary().size() ; i++)
