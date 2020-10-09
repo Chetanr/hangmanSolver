@@ -1,7 +1,6 @@
 package solver;
 
 import java.util.*;
-import java.util.regex.*;
 
 
 /**
@@ -16,10 +15,9 @@ public class DictAwareSolver extends HangmanSolver
     int count;
     int[] wordLength;
     String guessedCharacters;
-    String[] possibleWord;
-    Set<String> dictionary = new HashSet<String>();
-    HashSet<String> guessDictionary = new HashSet<String>();
-    HashMap <Character, Integer> feedback = new HashMap<Character, Integer>();
+    Set<String> dictionary = new HashSet<>();
+    ArrayList<String> guessDictionary;
+    HashMap <Character, Integer> feedback;
 
     public void setFeedback(Character c, int i) {
         this.feedback.put(c , i);
@@ -29,16 +27,9 @@ public class DictAwareSolver extends HangmanSolver
         return this.feedback;
     }
 
-    public String[] getPossibleWord() {
-        return this.possibleWord;
-    }
 
-    public void setPossibleWord(String possibleWord, int i) {
-        this.possibleWord[i] = possibleWord;
-    }
-
-    public HashSet<String> getGuessDictionary() {
-        return guessDictionary;
+    public List<String> getGuessDictionary() {
+        return this.guessDictionary;
     }
 
     public void setGuessDictionary(String word) {
@@ -50,7 +41,7 @@ public class DictAwareSolver extends HangmanSolver
     }
 
     public Set<String> getDictionary() {
-        return dictionary;
+        return this.dictionary;
     }
 
     public void setGuessedCharacters(char guessedCharacter) {
@@ -66,7 +57,7 @@ public class DictAwareSolver extends HangmanSolver
     }
 
     public int getWordLength() {
-        return wordLength[0];
+        return this.wordLength[0];
     }
 
     public void setWordLength(int[] wordLength) {
@@ -83,6 +74,8 @@ public class DictAwareSolver extends HangmanSolver
         this.maxIncorrectGuess = 0;
         this.guessedCharacters = "";
         this.count = 0;
+        this.feedback = new HashMap<>();
+        this.guessDictionary = new ArrayList<>();
 
     } // end of DictAwareSolver()
 
@@ -103,14 +96,28 @@ public class DictAwareSolver extends HangmanSolver
     @Override
     public char makeGuess() {
         Random r = new Random();
-        String charString = "abcdefghijklmnopqrstuvwxyz'";
+        String charString = "bcdfghjklmnpqrstvwxyz'";
+        String vowels = "aeiou";
 
-        char c = charString.charAt(r.nextInt(charString.length()));
 
-        //  this loop makes sure to not guess the same character again
-        while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+        char c;
+
+        if (count < 5)
+        {
+            c = vowels.charAt(r.nextInt(vowels.length()));
+            while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+            {
+                c = vowels.charAt(r.nextInt(vowels.length()));
+            }
+            count ++;
+        }
+        else
         {
             c = charString.charAt(r.nextInt(charString.length()));
+            while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+            {
+                c = charString.charAt(r.nextInt(charString.length()));
+            }
         }
 
         /*  Set the guessedCharacter String.
@@ -120,42 +127,41 @@ public class DictAwareSolver extends HangmanSolver
 
 
 
+
         /* this is used to set the temporary dictionary (guessDictionary) with the words
             of the length of the word to be guessed for the first time
          */
-        if (getGuessDictionary().isEmpty()) {
-            for (String j : getDictionary()) {
-                if (j.length() == getWordLength()) {
-                    Pattern pattern2 = Pattern.compile(Character.toString(c), Pattern.CASE_INSENSITIVE);
-                    Matcher matcher2 = pattern2.matcher(j);
-                    if (matcher2.find()) {
-                        setGuessDictionary(j);
-                    }
+        if (getGuessDictionary().isEmpty())
+        {
+            for (String j : getDictionary())
+            {
+                if (j.length() == getWordLength())
+                {
+                    setGuessDictionary(j);
                 }
             }
         }
 
         int numCh = 0;
-        if (!getFeedback().isEmpty())
+
+        for (int i = 0 ; i < getGuessDictionary().size() ; i++)
         {
-            for (String i : getGuessDictionary())
+            String temp = getGuessDictionary().get(i);
+            for (Character ch : getFeedback().keySet())
             {
-               for (Character ch : getFeedback().keySet())
-               {
-                   if (i.charAt(feedback.get(ch)) == ch)
-                   {
-                       numCh++;
-                   }
-               }
-               if (numCh == getFeedback().size())
-               {
-                   if (i.indexOf(c) > 1)
-                   {
-                       System.out.println("yes");
-                   }
-               }
+                if (temp.charAt(getFeedback().get(ch)) == ch)
+                {
+                    numCh++;
+                }
+            }
+            if (numCh != getFeedback().size())
+            {
+                getGuessDictionary().remove(temp);
             }
         }
+
+
+
         return c;
     } // end of makeGuess()
 
@@ -165,11 +171,9 @@ public class DictAwareSolver extends HangmanSolver
     {
         if (bGuess)
         {
-            for (int i = 0 ; i < lPositions.size(); i++)
-            {
-                for (int j = 0 ; j < lPositions.get(i).size(); j++)
-                {
-                    setFeedback(c, lPositions.get(i).get(j));
+            for (ArrayList<Integer> lPosition : lPositions) {
+                for (Integer integer : lPosition) {
+                    setFeedback(c, integer);
                 }
             }
         }
