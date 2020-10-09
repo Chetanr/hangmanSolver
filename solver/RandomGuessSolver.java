@@ -11,10 +11,10 @@ import java.lang.System;
  */
 public class RandomGuessSolver extends HangmanSolver
 {
-    int maxIncorrectGuesss = 0;
     int[] wordLength;
+    int count;
     Set<String> dictionary;
-    String guessedCharacters = "";
+    String guessedCharacters;
 
 
     public void setGuessedCharacters(char guessedCharacter) {
@@ -23,14 +23,6 @@ public class RandomGuessSolver extends HangmanSolver
 
     public String getGuessedCharacters() {
         return this.guessedCharacters;
-    }
-
-    public Set<String> getDictionary() {
-        return dictionary;
-    }
-
-    public void setMaxIncorrectGuesss(int maxIncorrectGuesss) {
-        this.maxIncorrectGuesss = maxIncorrectGuesss;
     }
 
     public void setWordLength(int[] wordLength) {
@@ -45,12 +37,13 @@ public class RandomGuessSolver extends HangmanSolver
      */
     public RandomGuessSolver(Set<String> dictionary) {
         this.dictionary = dictionary;
+        this.count = 0;
+        this.guessedCharacters = "";
     } // end of RandomGuessSolver()
 
 
     @Override
     public void newGame(int[] wordLengths, int maxIncorrectGuesses) {
-        setMaxIncorrectGuesss(maxIncorrectGuesses);
         setWordLength(wordLengths);
     } // end of newGame()
 
@@ -58,17 +51,33 @@ public class RandomGuessSolver extends HangmanSolver
     @Override
     public char makeGuess() {
         Random r = new Random();
-        String charString = "abcdefghijklmnopqrstuvwxyz'";
+        String charString = "bcdfghjklmnpqrstvwxyz'";
+        String vowels = "aeiou";
 
-        char c = charString.charAt(r.nextInt(charString.length()));
 
-        //this loop maskes sure to not repeat the same character again
-        while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+        char c;
+
+        if (count < 5)
+        {
+            c = vowels.charAt(r.nextInt(vowels.length()));
+            while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+            {
+                c = vowels.charAt(r.nextInt(vowels.length()));
+            }
+            count ++;
+        }
+        else
         {
             c = charString.charAt(r.nextInt(charString.length()));
+            while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+            {
+                c = charString.charAt(r.nextInt(charString.length()));
+            }
         }
 
-        //set the guessedCharacter
+        /*  Set the guessedCharacter String.
+            This is done to make sure no duplicate guessing of the character is done
+         */
         setGuessedCharacters(c);
 
         return c;
