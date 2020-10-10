@@ -38,6 +38,8 @@ public class DictAwareSolver extends HangmanSolver
     //this is used to store the correct guesses and compare with the words in guessDictionary
     HashMap <Character, Integer> feedback;
 
+
+    //this is used to store a possible word
     String possibleWord;
 
 
