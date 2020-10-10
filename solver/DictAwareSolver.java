@@ -1,7 +1,6 @@
 package solver;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**
@@ -13,8 +12,8 @@ import java.util.regex.Pattern;
 public class DictAwareSolver extends HangmanSolver
 {
 
-    //this is used to make guesses in the makeGuess() method
-    int count;
+    //this is used to check if makeGuess is called for the first time
+    boolean firstGuess = true;
 
 
     //stores the length of the word to be guessed
@@ -39,9 +38,17 @@ public class DictAwareSolver extends HangmanSolver
     HashMap <Character, Integer> feedback;
 
 
-    //this is used to store a possible word
-    String possibleWord;
+    HashMap<Character, Integer> characterHashMap;
 
+
+    public void setCharacterHashMap(Character c) {
+        this.characterHashMap.put(c , this.characterHashMap.get(c) + 1);
+    }
+
+
+    public HashMap<Character, Integer> getCharacterHashMap() {
+        return this.characterHashMap;
+    }
 
     /*
         setter for feedback variable
@@ -130,11 +137,11 @@ public class DictAwareSolver extends HangmanSolver
     public DictAwareSolver(Set<String> dictionary) {
         setDictionary(dictionary);
         this.guessedCharacters = "";
-        this.count = 0;
+//        this.count = 0;
         this.feedback = new HashMap<>();
         this.guessDictionary = new ArrayList<>();
-        this.possibleWord = "";
         this.isEmpty = true;
+        this.characterHashMap = new HashMap<>();
     } // end of DictAwareSolver()
 
 
@@ -147,55 +154,47 @@ public class DictAwareSolver extends HangmanSolver
     {
         setWordLength(wordLengths);
         for (int i = 0 ; i < getWordLength() ; i++)
-            this.possibleWord += ".";
+        {
+        }
+
     } // end of newGame()
 
 
     /*
         this function makes a guess. It perfoms the below functions
-        1. A unique character is generated
-        2. Update the guessDictionary when makeGuess() is called for the first time
-           based on the length of the word to be guessed
-        3. Check the guessDictionary and eliminate the words that are not required.
-           The words are removed if they do not match the positions of the characters
-           in feedback variable
-     */
+        1.
+            a. returns 'a' on the first call of the makeGuess() method
+            b. else it initilializes all the characters to 0 and stores in a hashmap
+        2. updates the guessDictionary if it is empty. This is done to
+        3. removes the words that are not required. This is done by making use of successfully
+           guessed characters and removing the words that do not have the characters in the
+           respective positions
+    */
     @Override
     public char makeGuess() {
-        Random r = new Random();
-        String charString = "bcdfghjklmnpqrstvwxyz'";
-        String vowels = "aeiou";
-
-
-        char c;
-
-        if (count < 5)
+        if (firstGuess)
         {
-            c = vowels.charAt(r.nextInt(vowels.length()));
-            while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
-            {
-                c = vowels.charAt(r.nextInt(vowels.length()));
-            }
-            count ++;
+            firstGuess = false;
+            return 'a';
         }
         else
         {
-            c = charString.charAt(r.nextInt(charString.length()));
-            while (getGuessedCharacters().indexOf(c) != -1 && getGuessedCharacters().length() > 0)
+            for (char ch = 'b' ; ch <= 'z' ; ch++)
             {
-                c = charString.charAt(r.nextInt(charString.length()));
+                this.characterHashMap.put(ch , 0);
+            }
+
+        }
+
+        if (!getFeedback().isEmpty())
+        {
+            for (char ch : getFeedback().keySet())
+            {
+                int i = getFeedback().get(ch);
+                getGuessDictionary().removeIf(str -> str.indexOf(ch) != i);
             }
         }
 
-        /*  Set the guessedCharacter String.
-            This is done to make sure no duplicate guessing of the character is done
-         */
-        setGuessedCharacters(c);
-
-
-        /* this is used to set the temporary dictionary (guessDictionary) with the words
-            of the length of the word to be guessed for the first time
-         */
         if (getGuessDictionary().isEmpty())
         {
             for (String j : getDictionary())
@@ -207,35 +206,34 @@ public class DictAwareSolver extends HangmanSolver
             }
         }
 
-        //sort the arraylist in ascending order
         Collections.sort(getGuessDictionary());
 
-        int numCh = 0;
-        for (int i = 0 ; i < getGuessDictionary().size() ; i++)
+        for (Character i : getCharacterHashMap().keySet())
         {
-
-            String temp = getGuessDictionary().get(i);
-            for (Character ch : getFeedback().keySet())
+            for (String str : getGuessDictionary())
             {
-                if (temp.charAt(getFeedback().get(ch)) == ch)
+                if (str.indexOf(i) >= 0)
                 {
-                    numCh++;
+                    setCharacterHashMap(i);
                 }
             }
-            if (numCh != getFeedback().size())
-            {
-                getGuessDictionary().remove(temp);
-            }
-            else if (numCh == getFeedback().size() && temp.indexOf(c) >= 0)
-            {
-               if (Pattern.matches(this.possibleWord, temp) && !this.isEmpty)
-               {
-                   return c;
-               }
-            }
         }
-        return c;
-    } // end of makeGuess()
+
+
+        char ch = Collections.max(getCharacterHashMap().entrySet(), Map.Entry.comparingByValue()).getKey();
+
+        while (getGuessedCharacters().indexOf(ch) != -1 && getGuessedCharacters().length() > 0)
+        {
+            ch = Collections.max(getCharacterHashMap().entrySet(), Map.Entry.comparingByValue()).getKey();
+            getCharacterHashMap().put(ch , 0);
+        }
+
+
+        setGuessedCharacters(ch);
+
+        return ch;
+    }
+
 
 
     /*
@@ -247,16 +245,12 @@ public class DictAwareSolver extends HangmanSolver
     {
         if (bGuess)
         {
-            StringBuilder str = new StringBuilder(this.possibleWord);
             for (ArrayList<Integer> lPosition : lPositions)
             {
                 for (Integer position : lPosition)
                 {
                     setFeedback(c, position);
-                    str.setCharAt(position,c);
                 }
-                this.possibleWord = str.toString();
-                this.isEmpty = false;
             }
         }
         // Implement me!
