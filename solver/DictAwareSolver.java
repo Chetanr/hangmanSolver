@@ -38,14 +38,21 @@ public class DictAwareSolver extends HangmanSolver
     HashMap <Character, Integer> feedback;
 
 
+    //used to store the characters and their frequency
     HashMap<Character, Integer> characterHashMap;
 
 
+    /*
+        setter for characterHashMap variable
+     */
     public void setCharacterHashMap(Character c) {
         this.characterHashMap.put(c , this.characterHashMap.get(c) + 1);
     }
 
 
+    /*
+        getter for characterHashMap variable
+     */
     public HashMap<Character, Integer> getCharacterHashMap() {
         return this.characterHashMap;
     }
@@ -83,7 +90,7 @@ public class DictAwareSolver extends HangmanSolver
 
 
     /*
-        getter for dictionary variable
+        setter for dictionary variable
      */
     public void setDictionary(Set<String> dictionary) {
         this.dictionary = dictionary;
@@ -91,7 +98,7 @@ public class DictAwareSolver extends HangmanSolver
 
 
     /*
-        setter for dictionary variable
+        getter for dictionary variable
      */
     public Set<String> getDictionary() {
         return this.dictionary;
@@ -137,7 +144,6 @@ public class DictAwareSolver extends HangmanSolver
     public DictAwareSolver(Set<String> dictionary) {
         setDictionary(dictionary);
         this.guessedCharacters = "";
-//        this.count = 0;
         this.feedback = new HashMap<>();
         this.guessDictionary = new ArrayList<>();
         this.isEmpty = true;
@@ -153,17 +159,13 @@ public class DictAwareSolver extends HangmanSolver
     public void newGame(int[] wordLengths, int maxIncorrectGuesses)
     {
         setWordLength(wordLengths);
-        for (int i = 0 ; i < getWordLength() ; i++)
-        {
-        }
-
     } // end of newGame()
 
 
     /*
         this function makes a guess. It perfoms the below functions
         1.
-            a. returns 'a' on the first call of the makeGuess() method
+            a. returns ''' on the first call of the makeGuess() method
             b. else it initilializes all the characters to 0 and stores in a hashmap
         2. updates the guessDictionary if it is empty. This is done to
         3. removes the words that are not required. This is done by making use of successfully
@@ -175,23 +177,13 @@ public class DictAwareSolver extends HangmanSolver
         if (firstGuess)
         {
             firstGuess = false;
-            return 'a';
+            return '\'';
         }
         else
         {
-            for (char ch = 'b' ; ch <= 'z' ; ch++)
+            for (char ch = 'a' ; ch <= 'z' ; ch++)
             {
                 this.characterHashMap.put(ch , 0);
-            }
-
-        }
-
-        if (!getFeedback().isEmpty())
-        {
-            for (char ch : getFeedback().keySet())
-            {
-                int i = getFeedback().get(ch);
-                getGuessDictionary().removeIf(str -> str.indexOf(ch) != i);
             }
         }
 
@@ -228,17 +220,18 @@ public class DictAwareSolver extends HangmanSolver
             getCharacterHashMap().put(ch , 0);
         }
 
-
         setGuessedCharacters(ch);
 
         return ch;
     }
 
 
-
     /*
         This function is used to store a correctly guessed character
-        in feedback variable
+        in feedback variable.
+        It also removes the words that are not required. This is done by making use of successfully
+        guessed characters and removing the words that do not have the characters in the
+        respective positions from guessDictionary
      */
     @Override
     public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
@@ -253,7 +246,15 @@ public class DictAwareSolver extends HangmanSolver
                 }
             }
         }
-        // Implement me!
+
+        if (!getFeedback().isEmpty())
+        {
+            for (char ch : getFeedback().keySet())
+            {
+                int i = getFeedback().get(ch);
+                getGuessDictionary().removeIf(str -> str.indexOf(ch) != i);
+            }
+        }
     } // end of guessFeedback()
 
 } // end of class DictAwareSolver
