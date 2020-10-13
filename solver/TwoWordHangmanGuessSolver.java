@@ -173,7 +173,6 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
         for (int i = 0 ; i < wordLengths.length ; i++)
         {
             setWordLength(wordLengths[i], i);
-//            System.out.println("length " + wordLengths[i]);
         }
 
     } // end of newGame()
@@ -182,7 +181,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     /*
          this function makes a guess. It perfoms the below functions
          1.
-             a. returns ''' on the first call of the makeGuess() method
+             a. returns "'"(single quote) on the first call of the makeGuess() method
              b. else it initilializes all the characters to 0 and stores in a hashmap
          2. updates the guessDictionary1 and guessDictionary2 if it is empty. This is done to
             narrow down the list of words to only those words that match the length of the word
@@ -226,7 +225,6 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
         }
 
 
-        Collections.sort(getGuessDictionary1());
 
         for (Character i : getCharacterHashMap().keySet())
         {

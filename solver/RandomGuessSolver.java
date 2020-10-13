@@ -1,7 +1,6 @@
 package solver;
 
 import java.util.*;
-import java.lang.System;
 
 /**
  * Random guessing strategy for Hangman. (task A)

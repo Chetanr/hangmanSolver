@@ -34,10 +34,6 @@ public class DictAwareSolver extends HangmanSolver
     ArrayList<String> guessDictionary;
 
 
-    //this is used to store the correct guesses and compare with the words in guessDictionary
-    HashMap <Character, Integer> feedback;
-
-
     //used to store the characters and their frequency
     HashMap<Character, Integer> characterHashMap;
 
@@ -57,20 +53,6 @@ public class DictAwareSolver extends HangmanSolver
         return this.characterHashMap;
     }
 
-    /*
-        setter for feedback variable
-     */
-    public void setFeedback(Character c, int i) {
-        this.feedback.put(c , i);
-    }
-
-
-    /*
-        getter for feedback variable
-     */
-    public HashMap<Character, Integer> getFeedback() {
-        return this.feedback;
-    }
 
 
     /*
@@ -144,7 +126,6 @@ public class DictAwareSolver extends HangmanSolver
     public DictAwareSolver(Set<String> dictionary) {
         setDictionary(dictionary);
         this.guessedCharacters = "";
-        this.feedback = new HashMap<>();
         this.guessDictionary = new ArrayList<>();
         this.isEmpty = true;
         this.characterHashMap = new HashMap<>();
@@ -159,13 +140,14 @@ public class DictAwareSolver extends HangmanSolver
     public void newGame(int[] wordLengths, int maxIncorrectGuesses)
     {
         setWordLength(wordLengths);
+
     } // end of newGame()
 
 
     /*
         this function makes a guess. It perfoms the below functions
         1.
-            a. returns ''' on the first call of the makeGuess() method
+            a. returns "'"(single quote) on the first call of the makeGuess() method
             b. else it initilializes all the characters to 0 and stores in a hashmap
         2. updates the guessDictionary if it is empty. This is done to
         3. removes the words that are not required. This is done by making use of successfully
@@ -198,7 +180,6 @@ public class DictAwareSolver extends HangmanSolver
             }
         }
 
-        Collections.sort(getGuessDictionary());
 
         for (Character i : getCharacterHashMap().keySet())
         {
@@ -210,7 +191,6 @@ public class DictAwareSolver extends HangmanSolver
                 }
             }
         }
-
 
         char ch = Collections.max(getCharacterHashMap().entrySet(), Map.Entry.comparingByValue()).getKey();
 
@@ -227,9 +207,7 @@ public class DictAwareSolver extends HangmanSolver
 
 
     /*
-        This function is used to store a correctly guessed character
-        in feedback variable.
-        It also removes the words that are not required. This is done by making use of successfully
+        This function removes the words that are not required. This is done by making use of successfully
         guessed characters and removing the words that do not have the characters in the
         respective positions from guessDictionary
      */
@@ -242,17 +220,8 @@ public class DictAwareSolver extends HangmanSolver
             {
                 for (Integer position : lPosition)
                 {
-                    setFeedback(c, position);
+                    getGuessDictionary().removeIf(str -> str.indexOf(c) != position);
                 }
-            }
-        }
-
-        if (!getFeedback().isEmpty())
-        {
-            for (char ch : getFeedback().keySet())
-            {
-                int i = getFeedback().get(ch);
-                getGuessDictionary().removeIf(str -> str.indexOf(ch) != i);
             }
         }
     } // end of guessFeedback()
