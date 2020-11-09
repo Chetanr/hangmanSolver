@@ -19,9 +19,6 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     int[] wordLength;
 
 
-    //used to check if the possibleWord is empty
-    boolean isEmpty;
-
     //this string stores the already guessed characters
     String guessedCharacters;
 
@@ -31,14 +28,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
 
 
     //this is used to maintain a temporary based on the length of the first word to be guessed
-    ArrayList<String> guessDictionary1;
-
-    //this is used to maintain a temporary based on the length of the second word to be guessed
-    ArrayList<String> guessDictionary2;
-
-
-    //this is used to store the correct guesses and compare with the words in guessDictionary
-    HashMap <Character, Integer> feedback;
+    ArrayList<String> guessDictionary;
 
 
     //used to store the characters and their frequency
@@ -85,46 +75,19 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     }
 
 
-    //getter for feedback variable
-    public HashMap<Character, Integer> getFeedback() {
-        return this.feedback;
-    }
-
-    //setter for feedback variable
-    public void setFeedback(Character c, int i) {
-        this.feedback.put(c , i);
-    }
-
-
     /*
         getter for guessDictionary1 variable
      */
-    public ArrayList<String> getGuessDictionary1() {
-        return this.guessDictionary1;
+    public ArrayList<String> getGuessDictionary() {
+        return this.guessDictionary;
     }
 
 
     /*
         setter for guessDictionary1 variable
      */
-    public void setGuessDictionary1(String word) {
-        this.guessDictionary1.add(word);
-    }
-
-
-    /*
-        getter for guessDictionary2 variable
-     */
-    public ArrayList<String> getGuessDictionary2() {
-        return this.guessDictionary2;
-    }
-
-
-    /*
-        setter for guessDictionary2 variable
-     */
-    public void setGuessDictionary2(String word) {
-        this.guessDictionary2.add(word);
+    public void setGuessDictionary(String word) {
+        this.guessDictionary.add(word);
     }
 
 
@@ -159,10 +122,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     public TwoWordHangmanGuessSolver(Set<String> dictionary) {
         setDictionary(dictionary);
         this.guessedCharacters = "";
-        this.feedback = new HashMap<>();
-        this.guessDictionary1 = new ArrayList<>();
-        this.guessDictionary2 = new ArrayList<>();
-        this.isEmpty = true;
+        this.guessDictionary = new ArrayList<>();
         this.characterHashMap = new HashMap<>();
         this.wordLength = new int[2];
     } // end of TwoWordHangmanGuessSolver()
@@ -196,47 +156,28 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
         }
         else
         {
+            this.characterHashMap.clear();
             for (char ch = 'a' ; ch <= 'z' ; ch++)
             {
                 this.characterHashMap.put(ch , 0);
             }
         }
 
-        if (getGuessDictionary1().isEmpty())
+        if (getGuessDictionary().isEmpty())
         {
             for (String j : getDictionary())
             {
-                if (j.length() == getWordLength(0))
+                if (j.length() == getWordLength(0) || j.length() == getWordLength(1))
                 {
-                    setGuessDictionary1(j);
+                    setGuessDictionary(j);
                 }
             }
         }
 
-        if (getGuessDictionary2().isEmpty())
-        {
-            for (String j : getDictionary())
-            {
-                if (j.length() == getWordLength(1))
-                {
-                    setGuessDictionary2(j);
-                }
-            }
-        }
-
-
-
+        
         for (Character i : getCharacterHashMap().keySet())
         {
-            for (String str : getGuessDictionary1())
-            {
-                if (str.indexOf(i) >= 0)
-                {
-                    setCharacterHashMap(i);
-                }
-            }
-
-            for (String str : getGuessDictionary2())
+            for (String str : getGuessDictionary())
             {
                 if (str.indexOf(i) >= 0)
                 {
@@ -265,7 +206,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
             in feedback variable
         2. It also removes the words that are not required. This is done by making use of successfully
            guessed characters and removing the words that do not have the characters in the
-           respective positions from guessDictionary1 and guessDictionary2
+           respective positions from guessDictionary
      */
     @Override
     public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
@@ -278,19 +219,10 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
                 {
                     for (Integer position : lPosition)
                     {
-                        setFeedback(c, position);
+                        getGuessDictionary().removeIf(str -> (str.indexOf(c) != position));
                     }
                 }
 
-            }
-        }
-
-        if (!getFeedback().isEmpty())
-        {
-            for (char ch : getFeedback().keySet())
-            {
-                int i = getFeedback().get(ch);
-                getGuessDictionary1().removeIf(str -> str.indexOf(ch) != i);
             }
         }
     } // end of guessFeedback()

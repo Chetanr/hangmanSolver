@@ -20,9 +20,6 @@ public class DictAwareSolver extends HangmanSolver
     int[] wordLength;
 
 
-    //used to check if the possibleWord is empty
-    boolean isEmpty;
-
     //this string stores the already guessed characters
     String guessedCharacters;
 
@@ -127,7 +124,6 @@ public class DictAwareSolver extends HangmanSolver
         setDictionary(dictionary);
         this.guessedCharacters = "";
         this.guessDictionary = new ArrayList<>();
-        this.isEmpty = true;
         this.characterHashMap = new HashMap<>();
     } // end of DictAwareSolver()
 
@@ -163,6 +159,7 @@ public class DictAwareSolver extends HangmanSolver
         }
         else
         {
+            this.characterHashMap.clear();
             for (char ch = 'a' ; ch <= 'z' ; ch++)
             {
                 this.characterHashMap.put(ch , 0);
